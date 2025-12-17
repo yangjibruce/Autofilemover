@@ -5,12 +5,14 @@ A simple tool to automatically monitor and move specified types of files from a 
 ## Features
 - Real-time monitoring of source directory and its subdirectories
 - Automatic file movement with conflict handling (renames files with the same name)
+- Displays the exact timestamp for each file movement
+- Shows the cumulative size of moved files in GB during the current session.
 - Customizable file extensions to monitor (supports any file type)
 - Easy configuration via a text file
 - Lightweight and runs in the background
 
 ## Download
-You can download the precompiled executable file from the [Releases](https://github.com/yourusername/autofilemover/releases) section. No installation required - just run the .exe file.
+You can download the precompiled executable file from the Releases. No installation required - just run the .exe file.
 
 ## Usage Guide
 
@@ -43,7 +45,7 @@ Open `path.txt` with a text editor and set the following parameters:
 - The program waits 0.5 seconds before moving files to ensure they're fully written
 - Subdirectories of the source directory are monitored recursively
 - If a file with the same name exists in the destination, it will be renamed (e.g., `document.txt` → `document_1.txt`)
-- All configuration changes require a program restart to take effect
+- The cumulative data size is reset when the program restarts
 
 ---
 
@@ -54,12 +56,14 @@ Open `path.txt` with a text editor and set the following parameters:
 ## 功能特点
 - 实时监控源目录及其子目录
 - 自动移动文件并处理同名冲突（自动重命名文件）
+- 文件移动时会同步显示操作发生的时间。
+- 实时显示当前已累计移动的文件总大小（GB）。
 - 可自定义监控的文件扩展名（支持任何文件类型）
 - 通过文本文件轻松配置
 - 轻量且在后台运行
 
 ## 下载
-您可以从[发布页面](https://github.com/yourusername/autofilemover/releases)下载预编译的可执行文件。无需安装，直接运行.exe文件即可。
+您可以从发布页面下载预编译的可执行文件。无需安装，直接运行.exe文件即可。
 
 ## 使用指南
 
@@ -92,4 +96,4 @@ D:/path/to/your/destination/directory
 - 程序会等待0.5秒再移动文件，以确保文件已完全写入
 - 源目录的子目录会被递归监控
 - 如果目标目录中存在同名文件，将自动重命名（例如`document.txt` → `document_1.txt`）
-- 所有配置更改需要重启程序才能生效
+- 累计移动的文件大小会在程序重启后清零

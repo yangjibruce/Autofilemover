@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import shutil
+from datetime import datetime  # 仅新增此行
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -9,7 +10,6 @@ from watchdog.events import FileSystemEventHandler
 CONFIG_FILE = "path.txt"
 
 # -------------------------- 配置参数（不变动）--------------------------
-# 文件创建/移动后延迟移动的时间（秒），避免文件未写入完成就移动
 DELAY_SECONDS = 0.5
 # ----------------------------------------------------------------------
 
@@ -38,6 +38,7 @@ DEFAULT_CONFIG_CONTENT = f"""# -------------------------------------------------
 SOURCE_DIR = None
 DEST_DIR = None
 SUPPORTED_EXTENSIONS = ()
+TOTAL_MOVED_SIZE = 0.0  # 新增：累计移动大小（字节）
 
 
 def load_paths_from_file():
@@ -107,8 +108,6 @@ def load_paths_from_file():
 
 
 class VideoFileHandler(FileSystemEventHandler):
-    # ... (VideoFileHandler 类保持不变) ...
-    # 为了保持简洁，这里省略了 on_created, on_moved, move_video_file 方法，它们与上一次提交的代码相同
     
     def on_created(self, event):
         """当文件/目录被创建时触发"""
@@ -138,9 +137,16 @@ class VideoFileHandler(FileSystemEventHandler):
         """
         移动文件到目标目录，处理同名文件冲突
         """
+        global TOTAL_MOVED_SIZE # 新增：引用全局变量
         if not DEST_DIR:
             print("目标目录未初始化！程序异常。")
             return
+
+        # 移动前记录文件大小
+        try:
+            file_size = os.path.getsize(file_path)
+        except:
+            file_size = 0
 
         file_name = os.path.basename(file_path)
         dest_file_path = os.path.join(DEST_DIR, file_name)
@@ -154,7 +160,13 @@ class VideoFileHandler(FileSystemEventHandler):
 
         try:
             shutil.move(file_path, dest_file_path)
-            print(f"成功移动文件：{file_path} -> {dest_file_path}")
+            # --- 以下为新增的逻辑 ---
+            TOTAL_MOVED_SIZE += file_size
+            total_gb = TOTAL_MOVED_SIZE / (1024**3)
+            current_time = datetime.now().strftime("%H:%M:%S")
+            print(f"[{current_time}] 成功移动文件：{file_path} -> {dest_file_path}")
+            print(f" >> 本次运行累计移动：{total_gb:.2f} GB")
+            # -----------------------
         except PermissionError:
             print(f"移动失败：无权限访问文件 {file_path}")
         except FileNotFoundError:
