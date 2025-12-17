@@ -2,7 +2,8 @@ import os
 import sys
 import time
 import shutil
-from datetime import datetime  # 仅新增此行
+import msvcrt  # 新增：用于检测控制台按键输入
+from datetime import datetime
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -14,13 +15,13 @@ DELAY_SECONDS = 0.5
 # ----------------------------------------------------------------------
 
 # 默认配置内容
-DEFAULT_SOURCE_DIR = "/path/to/your/VideoSource"
-DEFAULT_DEST_DIR = "/path/to/your/VideoDestination"
-DEFAULT_EXTENSIONS = ".mp4, .mkv, .avi"
+DEFAULT_SOURCE_DIR = r"C:\Users\YourName\Downloads\Source"
+DEFAULT_DEST_DIR = r"D:\MyFile\Organized"
+DEFAULT_EXTENSIONS = ".mp4, .txt, .pdf, .jpg"
 
 DEFAULT_CONFIG_CONTENT = f"""# ----------------------------------------------------------------------
 # 文件整理监控配置：path.txt
-# 请将下方 /path/to/your/ 替换为您电脑上的实际绝对路径！
+# 请将下方路径替换为您电脑上的实际绝对路径！
 # ----------------------------------------------------------------------
 
 # 第一行：【必填】要监控的源目录（SOURCE_DIR），程序将实时扫描此目录及其子目录。
@@ -204,16 +205,24 @@ def main():
     # 5. 启动观察者
     observer.start()
     print("-" * 30)
-    print(f"监控服务已启动。")
+    print(f"Autofilemover v1.2\n\n监控服务已启动。")
     print(f"正在监控：{SOURCE_DIR} (包括子目录)")
     print(f"文件将移动到：{DEST_DIR}")
     print(f"监控类型：{', '.join(SUPPORTED_EXTENSIONS)}")
     print("-" * 30)
+    print("功能提示：当此窗口激活时，按 F 键可直接打开目标文件夹")
     print("按 Ctrl+C 停止监控")
 
     try:
         while True:
-            time.sleep(1)
+            # --- 新增功能：监听 F 键 ---
+            if msvcrt.kbhit():  # 检查是否有按键按下
+                key = msvcrt.getch()
+                if key in (b'f', b'F'):  # 如果按下的是 f 或 F
+                    print(f">> 正在打开目录: {DEST_DIR}")
+                    os.startfile(DEST_DIR)
+            # --------------------------
+            time.sleep(0.1) # 降低 CPU 占用，且保证响应灵敏
     except KeyboardInterrupt:
         observer.stop()
         print("\n正在停止监控...")
